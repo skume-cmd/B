@@ -2,44 +2,51 @@
 import { GLTFLoader } from "GLTFLoader";
 import { OrbitControls } from "OrbitControls";
 
-console.log('THREE OK')
 
-const scene = new THREE.Scene()
-const camera = new THREE.PerspectiveCamera(
-    60,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    100
-)
-camera.position.set(0, 1.5, 3)
+// 画面サイズの取得
+const windowWidth = window.innerWidth;
+const windowHeight = window.innerHeight;
 
-const renderer = new THREE.WebGLRenderer({ antialias: true })
-renderer.setSize(window.innerWidth, window.innerHeight)
-document.body.appendChild(renderer.domElement)
+// レンダラーの作成
+const canvas = document.getElementById('canvas')
+const renderer = new THREE.WebGLRenderer({ canvas: canvas });
+renderer.setSize(windowWidth, windowHeight);
 
-// ライト
-scene.add(new THREE.AmbientLight(0xffffff, 0.6))
-const light = new THREE.DirectionalLight(0xffffff, 1)
-light.position.set(5, 10, 5)
-scene.add(light)
+// シーンの作成
+const scene = new THREE.Scene();
+// 背景色の設定(水色)
+scene.background = new THREE.Color('#00bfff');
 
-// モデル読み込み
-const loader = new GLTFLoader()
-loader.load(
-    './models/character.glb',
-    (gltf) => {
-        console.log('GLTF loaded', gltf)
-        scene.add(gltf.scene)
-    },
-    undefined,
-    (error) => {
-        console.error('GLTF error', error)
-    }
-)
+// 見やすいようにヘルパー（網目）を設定
+let gridHelper = new THREE.GridHelper();
+scene.add(gridHelper);
 
+// カメラを作成
+const camera = new THREE.PerspectiveCamera(75, windowWidth / windowHeight, 0.1, 1000);
+camera.position.set(5, 2, 0);
+camera.lookAt(0, 0, 0);
+
+// ライトの作成
+const light = new THREE.PointLight(0xffffff, 1, 100);
+light.position.set(10, 20, 5);
+scene.add(light);
+
+// マウス制御
+const controls = new OrbitControls(camera, renderer.domElement);
+
+// 3Dモデルの読み込み
+const loader = new GLTFLoader();
+loader.load('character.glb', function (gltf) {
+    const model = gltf.scene;
+    model.scale.set(0.1, 0.1, 0.1);
+    scene.add(model);
+});
+
+// アニメーション
 function animate() {
-    requestAnimationFrame(animate)
-    renderer.render(scene, camera)
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
 }
 
-animate()
+// アニメーション実行
+animate();
