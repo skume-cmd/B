@@ -1,13 +1,10 @@
-// :white_check_mark: CDNî≈ three.js
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+Ôªøimport * as THREE from 'three';
+import { GLTFLoader } from "GLTFLoader";
+import { OrbitControls } from "OrbitControls";
 
-// --------------------------------------------------------------------
-// äÓñ{ÉZÉbÉgÉAÉbÉv
-// --------------------------------------------------------------------
+console.log('THREE OK')
+
 const scene = new THREE.Scene()
-scene.background = new THREE.Color(0x202020)
-
 const camera = new THREE.PerspectiveCamera(
     60,
     window.innerWidth / window.innerHeight,
@@ -18,94 +15,30 @@ camera.position.set(0, 1.5, 3)
 
 const renderer = new THREE.WebGLRenderer({ antialias: true })
 renderer.setSize(window.innerWidth, window.innerHeight)
-renderer.setPixelRatio(window.devicePixelRatio)
 document.body.appendChild(renderer.domElement)
 
-// --------------------------------------------------------------------
-// ÉâÉCÉg
-// --------------------------------------------------------------------
+// „É©„Ç§„Éà
 scene.add(new THREE.AmbientLight(0xffffff, 0.6))
+const light = new THREE.DirectionalLight(0xffffff, 1)
+light.position.set(5, 10, 5)
+scene.add(light)
 
-const dirLight = new THREE.DirectionalLight(0xffffff, 1)
-dirLight.position.set(5, 10, 5)
-scene.add(dirLight)
-
-// --------------------------------------------------------------------
-// ÉÇÉfÉã & ÉAÉjÉÅÅ[ÉVÉáÉì
-// --------------------------------------------------------------------
-let mixer
-let model
-const actions = {}
-let currentAction
-
-const clock = new THREE.Clock()
-
+// „É¢„Éá„É´Ë™≠„ÅøËæº„Åø
 const loader = new GLTFLoader()
-loader.load('./models/character.glb', (gltf) => {
-    model = gltf.scene
-    scene.add(model)
-
-    mixer = new THREE.AnimationMixer(model)
-
-    // ï°êîÉAÉjÉÅÅ[ÉVÉáÉìÇìoò^
-    gltf.animations.forEach((clip) => {
-        actions[clip.name] = mixer.clipAction(clip)
-        console.log('Animation:', clip.name)
-    })
-
-    // ç≈èâÇÃÉAÉjÉÅÅ[ÉVÉáÉìÅió·Åj
-    currentAction = actions['Idle']
-    if (currentAction) {
-        currentAction.play()
+loader.load(
+    './models/character.glb',
+    (gltf) => {
+        console.log('GLTF loaded', gltf)
+        scene.add(gltf.scene)
+    },
+    undefined,
+    (error) => {
+        console.error('GLTF error', error)
     }
-})
+)
 
-// --------------------------------------------------------------------
-// ÉAÉjÉÅÅ[ÉVÉáÉìêÿÇËë÷Ç¶ä÷êî
-// --------------------------------------------------------------------
-function playAction(name) {
-    const nextAction = actions[name]
-    if (!nextAction || nextAction === currentAction) return
-
-    currentAction.fadeOut(0.3)
-    nextAction.reset().fadeIn(0.3).play()
-    currentAction = nextAction
-}
-
-// --------------------------------------------------------------------
-// ÉLÅ[ëÄçÏÅió·Åj
-// --------------------------------------------------------------------
-window.addEventListener('keydown', (e) => {
-    if (!model) return
-
-    switch (e.code) {
-        case 'KeyW':
-            playAction('Walk')
-            break
-        case 'KeyS':
-            playAction('Idle')
-            break
-    }
-})
-
-// --------------------------------------------------------------------
-// ÉäÉTÉCÉYëŒâû
-// --------------------------------------------------------------------
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight
-    camera.updateProjectionMatrix()
-    renderer.setSize(window.innerWidth, window.innerHeight)
-})
-
-// --------------------------------------------------------------------
-// ÉãÅ[Év
-// --------------------------------------------------------------------
 function animate() {
     requestAnimationFrame(animate)
-
-    const delta = clock.getDelta()
-    if (mixer) mixer.update(delta)
-
     renderer.render(scene, camera)
 }
 

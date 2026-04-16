@@ -3,19 +3,24 @@
 <head>
     <meta charset="UTF-8" />
     <title>three.js animation</title>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./three.js-dev/build/three.module.js",
+                "OrbitControls":"./three.js-dev/examples/jsm/controls/OrbitControls.js",
+                "GLTFLoader":"./three.js-dev/examples/jsm/loaders/GLTFLoader.js"
+            }
+        }
+    </script>
     <style>
-           body {
-                 margin: 0;
-                 overflow: hidden;
-
+        body {
+            margin: 0;
+            overflow: hidden;
         }
 
-           canvas {
-                 display: block;
-
+        canvas {
+            display: block;
         }
-
-
     </style>
 </head>
 <body>
